@@ -6,8 +6,8 @@ port: {{ .Values.service.port }}
 export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "ib-gateway.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
 export CONTAINER_PORT=$(kubectl get pod --namespace {{ .Release.Namespace }} $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
 
-kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 4002:$CONTAINER_PORT
+kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME {{ .Values.service.port }}:$CONTAINER_PORT
 
 # Port Forward (connect to Service)
 
-kubectl port-forward svc/{{ .Release.Name }} 4002:4002
+kubectl port-forward svc/{{ .Release.Name }} {{ .Values.service.port }}:{{ .Values.service.port }}
