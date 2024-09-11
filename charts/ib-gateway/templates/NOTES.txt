@@ -1,0 +1,13 @@
+TRADING_MODEendpoint: {{ .Release.Name }}.{{ .Release.Namespace }}.svc.cluster.local
+port: {{ .Values.service.port }}
+
+# Port Forward (connect to Pod directly)
+
+export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "ib-gateway.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
+export CONTAINER_PORT=$(kubectl get pod --namespace {{ .Release.Namespace }} $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
+
+kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 4002:$CONTAINER_PORT
+
+# Port Forward (connect to Service)
+
+kubectl port-forward svc/{{ .Release.Name }} 4002:4002
